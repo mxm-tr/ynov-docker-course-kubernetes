@@ -1,0 +1,6 @@
+dependencies:
+- name: capsule
+  repository: https://clastix.github.io/charts
+  version: 0.4.2
+digest: sha256:27c0375ea9ef877cc08637307dcef57e39d5be43f17a54174d98c0dd35ca39a5
+generated: "2023-04-26T17:28:16.509947972+02:00"
