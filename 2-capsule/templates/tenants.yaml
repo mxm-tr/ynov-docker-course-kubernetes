@@ -1,0 +1,15 @@
+{{- range $tenant := .Values.tenants }}
+apiVersion: capsule.clastix.io/v1beta2
+kind: Tenant
+metadata:
+  name: {{ $tenant.name }}
+spec:
+  owners:
+{{- range $owner := $tenant.owners }}
+  - name: {{ $owner }}
+    kind: User
+  namespaceOptions:
+    quota: 1
+{{- end }}
+---
+{{- end }}

@@ -1,3 +1,56 @@
+tenants:
+  - name: shooters
+    owners:
+      - shooters-owner
+  - name: best-best-best-groupe-toiture-pain-de-mie
+    owners:
+      - bbbgtpdm-owner
+  - name: hotelia
+    owners:
+      - hotelia-owner
+  - name: movieapp
+    owners:
+      - movieapp-owner
+  - name: ybook
+    owners:
+      - ybook-owner
+  - name: ai-photostock
+    owners:
+      - ai-photostock-owner
+  - name: stevent
+    owners:
+      - stevent-owner
+  - name: yt
+    owners:
+      - yt-owner
+  - name: pendu
+    owners:
+      - pendu-owner
+  - name: jad
+    owners:
+      - jad-owner
+  - name: yword
+    owners:
+      - yword-owner
+  - name: fantazoo
+    owners:
+      - fantazoo-owner
+  - name: wear
+    owners:
+      - wear-owner
+  - name: munchachos
+    owners:
+      - munchachos-owner
+  - name: ybook2
+    owners:
+      - ybook2-owner
+  - name: minecraft
+    owners:
+      - minecraft-owner
+  - name: dtfp
+    owners:
+      - dtfp-owner
+
 capsule:
   # Secret Options
   tls:
