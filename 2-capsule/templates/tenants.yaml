@@ -8,8 +8,37 @@ spec:
 {{- range $owner := $tenant.owners }}
   - name: {{ $owner }}
     kind: User
+    clusterRoles:
+      - admin
+      - capsule-namespace-deleter
   namespaceOptions:
     quota: 1
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ $tenant.name }}-{{ $owner }}-crds
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: capsule-view-crds
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: {{ $owner }}
 {{- end }}
 ---
 {{- end }}
+
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: capsule-view-crds
+rules:
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
