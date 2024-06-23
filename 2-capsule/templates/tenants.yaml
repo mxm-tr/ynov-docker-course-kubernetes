@@ -4,6 +4,8 @@ kind: Tenant
 metadata:
   name: {{ $tenant.name }}
 spec:
+  ingressOptions:
+    hostnameCollisionScope: Cluster
   owners:
 {{- range $owner := $tenant.owners }}
   - name: {{ $owner }}
@@ -26,6 +28,45 @@ subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: User
   name: {{ $owner }}
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ $tenant.name }}-{{ $owner }}-kube-system-svc-view
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: services-viewer
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: {{ $owner }}
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ $tenant.name }}-{{ $owner }}-namespace-view
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: namespace-viewer
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: {{ $owner }}
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ $tenant.name }}-{{ $owner }}-cluster-issuers-view
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-issuers-viewer
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: {{ $owner }}
 {{- end }}
 ---
 {{- end }}
@@ -42,3 +83,30 @@ rules:
   verbs:
   - get
   - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: services-viewer
+rules:
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "watch"]
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: namespace-viewer
+rules:
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "list", "watch"]
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cluster-issuers-viewer
+rules:
+- apiGroups: [""]
+  resources: ["clusterissuers"]
+  verbs: ["get", "list", "watch"]

@@ -1,7 +1,5 @@
 #!/bin/bash
-
 set -e
-
 
 function check_command() {
     local command=$1
@@ -14,21 +12,14 @@ function check_command() {
 
 function show_usage() {
     echo "Usage:"
-    echo -e "\t $0 NAMESPACE OUTPUT_DIR"
+    echo -e "\t $0 OUTPUT_DIR"
 }
 
 check_command openssl
 check_command kubectl
 check_command jq
 
-NAMESPACE=$1
-OUTPUT_DIR=$2
-
-if [[ -z ${NAMESPACE} ]]; then
-    echo "Namespace has not been specified!"
-    show_usage
-    exit 1
-fi
+OUTPUT_DIR=$1
 
 if [[ -z ${OUTPUT_DIR} ]]; then
     echo "Specify the output directory"
@@ -42,8 +33,8 @@ if [[ ! -d ${OUTPUT_DIR} ]]; then
 fi
 
 cd "$(dirname "$0")"
-for tenant_name in $(kubectl get tenants -o name -n "$NAMESPACE"); do
+for tenant_name in $(kubectl get tenants -o name); do
     tenant_name=$(echo "$tenant_name" | cut -d "/" -f2-)
-    kubectl -n "$NAMESPACE" get -ojsonpath="{.spec.owners[].name }" tenant "$tenant_name" | xargs -I USER ./create-user.sh USER "$tenant_name" "$OUTPUT_DIR"
+    kubectl get -ojsonpath="{.spec.owners[].name }" tenant "$tenant_name" | xargs -I USER ./create-user.sh USER "$tenant_name" "$OUTPUT_DIR"
     
 done

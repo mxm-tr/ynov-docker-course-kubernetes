@@ -1,47 +1,84 @@
+# User guide
 
-## 0. Recommended: Install the git hooks
+This guide helps you interact with a multi-tenant kubernetes cluster configured using the [Admin Guide](ADMIN.md).
 
-This should prevent you from pushing private keys in cleartext:
+## Prerequisites
 
-```
-git config core.hooksPath
-```
+Make sure that you have:
 
-Secrets are being encrypted using Ansible Vault
+* The required `kubectl`, `helm` clients installed,
+* A kubeconfig file to communicate with an existing kubernetes cluster.
+* `ansible-vault` installed if you need to decrypt the kubeconfig files.
 
-## 1. Install the NGINX Ingress Controller
+### 1. Decrypt your credentials
 
-```
-helm upgrade --install ingress-nginx ./0-ingress-nginx --namespace ingress-nginx --create-namespace
-```
-
-More information: https://kubernetes.github.io/ingress-nginx/deploy/#quick-start
-
-
-## 2. Install Cert-manager
-
-```
-helm install cert-manager ./1-cert-manager --namespace cert-manager --create-namespace
+```bash
+ansible-vault decrypt kubeconfigs/teachers-test*
 ```
 
-More information: https://cert-manager.io/docs/installation/helm/#4-install-cert-manager
+### 2. Log into the kubernetes cluster
 
-## 3. Install Capsule
-
-Edit the tenant list in `2-capsule/values.yaml`, and install the helm chart:
-
-```
-helm upgrade --install capsule ./2-capsule --namespace capsule-system --create-namespace
+```bash
+export KUBECONFIG=kubeconfigs/teachers-test.kubeconfig
 ```
 
-More information: https://github.com/clastix/capsule/blob/master/charts/capsule/README.md#cert-manager-integration
+### 3. Create the namespace for your team
 
-## 4. Generate user accounts
+```bash
+kubectl create ns test
+```
 
-Generate the kubeconfigs for your user using the `./2-capsule/hack/create-all-users.sh` script.
+If everything is setup properly, you should get:
 
-For example, to generate the kubeconfigs for all csrs in the default namespace, under the `kube-configs` directory:
+```bash
+kubectl get pods -n test
+No resources found in test namespace
+```
+
+Hooray 🎉
+
+### 4. Get the public ingress ip of your cluster
+
+Get the public IP address of the ingress controller:
 
 ```
-./2-capsule/hack/create-all-users.sh default kube-configs
+kubectl get svc -n ingress-nginx ingress-nginx-controller
+```
+
+### 5. Configure a DNS entry for your app
+
+Edit the `ingress.hosts` and `ingress.tls` entries in the [./4-sample-app/values.yaml] file.
+
+### 6. Deploy the sample app
+
+```bash
+helm -n test upgrade --install my-sample-app ./4-sample-app
+```
+
+### 7. Edit the sample app with your own code
+
+Edit the helm chart to use your own app, and upgrade your release:
+
+```bash
+helm -n test upgrade --install my-sample-app ./4-sample-app
+```
+
+### 8. Get a trusted cert from let's encrypt
+
+Is your app reachable? Now just get a trusted certificate to make it official! Change `letsencrypt-dev` to `letsencrypt-prod` and redeploy your app to make the magic happen! 🎊🤩🍾
+
+### Note about private registries
+
+You may want to use a pull secret to download images from private registries
+
+```bash
+docker login
+...
+
+kubectl -n test create secret generic dockerhub  --from-file=.dockerconfigjson=/home/mxmtr/.docker/config.json    --type=kubernetes.io/dockerconfigjson
+```
+
+```yaml
+imagePullSecrets:
+  - name: dockerhub
 ```
