@@ -1,4 +1,10 @@
 tenants:
+  - name: 3m
+    owners:
+      - 3m-owners
+  - name: plex
+    owners:
+      - plex-owners
   - name: test
     owners:
       - teachers
