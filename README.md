@@ -47,7 +47,7 @@ kubectl get svc -n ingress-nginx ingress-nginx-controller
 
 ### 5. Configure a DNS entry for your app
 
-Edit the `ingress.hosts` and `ingress.tls` entries in the [./4-sample-app/values.yaml] file.
+Edit the `ingress.hosts` and `ingress.tls` entries in your app's [values.yaml](./4-sample-app/values.yaml).
 
 ### 6. Deploy the sample app
 
